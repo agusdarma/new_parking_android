@@ -1,0 +1,30 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/pt-midtrans/maven" }
+    }
+
+    project.plugins.whenPluginAdded { plugin ->
+        if ("com.android.build.gradle.AppPlugin".equals(plugin.class.name)) {
+            println "Disable pre dexing for module ${project.name}"
+            project.android.dexOptions.preDexLibraries = false
+        } else if ("com.android.build.gradle.LibraryPlugin".equals(plugin.class.name)) {
+            println "Disable pre dexing for module ${project.name}"
+            project.android.dexOptions.preDexLibraries = false
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
