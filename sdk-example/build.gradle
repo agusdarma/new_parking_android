@@ -25,20 +25,24 @@ android {
     productFlavors {
         development {
             applicationId "com.midtrans.sdk.sample.development"
-            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:8080/parking-trx/\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:6555/parking-trx/\""
             buildConfigField "String", "CLIENT_KEY", "\"VT-client-Uz6HDzD8yYF0vhr-\""
+         //   buildConfigField "String", "BASE_URL", "\"http://192.168.0.100:8080/parking-trx/\""
+         //   buildConfigField "String", "CLIENT_KEY", "\"VT-client-C-m5qVIS7rH1i6DL\""
         }
 
         staging {
             applicationId "com.midtrans.sdk.sample.staging"
-            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:8080/parking-trx/\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:6555/parking-trx/\""
             buildConfigField "String", "CLIENT_KEY", "\"VT-client-Uz6HDzD8yYF0vhr-\""
+            //buildConfigField "String", "BASE_URL", "\"http://192.168.0.100:8080/parking-trx/\""
+           // buildConfigField "String", "CLIENT_KEY", "\"VT-client-C-m5qVIS7rH1i6DL\""
         }
 
         production {
             applicationId "com.midtrans.sdk.sample.production"
-            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:8080/parking-trx/\""
-            buildConfigField "String", "CLIENT_KEY", "\"VT-client-rgcSzOn6bUEtuK3B\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.100:8080/parking-trx/\""
+            buildConfigField "String", "CLIENT_KEY", "\"VT-client-Xnq6xjx8484uBU-j\""
         }
     }
     buildTypes {

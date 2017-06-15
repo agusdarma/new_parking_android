@@ -151,12 +151,12 @@
     <string name="midtrans_store">midtrans store</string>
 
     <!-- Demo Account-->
-    <string name="account_name">Budi Utomo</string>
+    <string name="account_name">Yohanes</string>
     <string name="account_mycards">My Cards</string>
     <string name="account_details">Account Details</string>
-    <string name="account_email">budi@utomo.com</string>
+    <string name="account_email">vincent_yohanes@yahoo.com</string>
     <string name="user_address">Midplaza 2, 4th Jl. Jendral Sudirman Kav. 10-11, Jakarta - 10220 \n Indonesia</string>
-    <string name="account_phone">081808466410</string>
+    <string name="account_phone">081807776508</string>
     <string name="my_account">My Account</string>
     <string name="add_new_card">Add New Card</string>
 

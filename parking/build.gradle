@@ -21,16 +21,21 @@ repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
 
+
 android {
+    useLibrary  'org.apache.http.legacy'
+
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
-        applicationId "com.midtrans.demo"
-        minSdkVersion 16
+        applicationId "com.project.parking"
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        renderscriptTargetApi 22
+        renderscriptSupportModeEnabled true
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -71,10 +76,8 @@ android {
     productFlavors {
         development {
             applicationId "com.midtrans.sdk.demo.development"
-            buildConfigField "String", "BASE_URL", "\"http://192.168.0.171:6555/parking-trx/\""
-            buildConfigField "String", "CLIENT_KEY", "\"VT-client-Uz6HDzD8yYF0vhr-\""
-       //     buildConfigField "String", "BASE_URL", "\"http://192.168.0.100:8080/parking-trx/\""
-       //     buildConfigField "String", "CLIENT_KEY", "\"VT-client-C-m5qVIS7rH1i6DL\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.0.100:8080/parking-trx/\""
+            buildConfigField "String", "CLIENT_KEY", "\"VT-client-C-m5qVIS7rH1i6DL\""
         }
 
         production {
@@ -90,7 +93,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
     testCompile 'junit:junit:4.12'
     developmentCompile project(path: ':uikit', configuration: 'developmentRelease')
     productionCompile project(path: ':uikit', configuration: 'productionRelease')
@@ -105,4 +108,13 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
         transitive = true;
     }
+    //compile 'org.apache.httpcomponents:httpcore:4.4.1'
+//    compile 'org.apache.httpcomponents:httpclient:4.5'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
+    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15', version: '1.40'
+//    compile 'com.github.goka.blurredgridmenu:blurredgridmenu:1.0.2'
+    compile project(':blurredgridmenu')
+
 }

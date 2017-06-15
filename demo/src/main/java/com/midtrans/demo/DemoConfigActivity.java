@@ -2176,8 +2176,9 @@ public class DemoConfigActivity extends AppCompatActivity implements Transaction
             MidtransSDK.getInstance().setColorTheme(new CustomColorTheme(DemoThemeConstants.BLACK_PRIMARY_HEX, DemoThemeConstants.BLACK_PRIMARY_DARK_HEX, DemoThemeConstants.BLACK_SECONDARY_HEX));
         }
         // Create new Transaction Request
-        TransactionRequest transactionRequestNew = new TransactionRequest(System.currentTimeMillis() + "", 20000);
-
+//        TransactionRequest transactionRequestNew = new TransactionRequest(System.currentTimeMillis() + "", 20000);
+        TransactionRequest transactionRequestNew = new TransactionRequest("BID081808603153762754", 20000);
+        transactionRequestNew.setCustomField1("0818086031534Z2UMWMRT4CZEH30I0T59TEP3BHQBD");
 
         // Define item details
         ItemDetails itemDetails = new ItemDetails("1", 20000, 1, getString(R.string.product_name_sample));
@@ -2334,6 +2335,7 @@ public class DemoConfigActivity extends AppCompatActivity implements Transaction
                     new BankTransferRequestModel(vaNumber)
             );
         }
+
 
         return transactionRequestNew;
     }
