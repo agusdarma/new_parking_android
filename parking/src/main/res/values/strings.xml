@@ -154,4 +154,6 @@
     <string name="buton_menu_history_booking">History Booking</string>
     <string name="buton_menu_check_in">Check In</string>
     <string name="buton_menu_refreshing_mall">Refreshing Mall</string>
+
+    <string name="confirmation_back">Please click BACK again to exit</string>
 </resources>

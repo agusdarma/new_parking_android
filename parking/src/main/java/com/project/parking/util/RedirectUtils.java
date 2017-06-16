@@ -5,7 +5,9 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 
+import com.project.parking.MainActivity;
 import com.project.parking.activity.LoginActivity;
+import com.project.parking.menu.MenuActivity;
 
 /**
  * Created by Yohanes on 16/06/2017.
@@ -28,6 +30,14 @@ public class RedirectUtils extends Fragment {
         act.getFragmentManager().beginTransaction().remove(this).commit();
         act.finish();
         Intent intent = new Intent(ctx, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        ctx.startActivity(intent);
+    }
+
+    public void redirectToMainMenu() {
+        act.getFragmentManager().beginTransaction().remove(this).commit();
+        act.finish();
+        Intent intent = new Intent(ctx, MenuActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ctx.startActivity(intent);
     }

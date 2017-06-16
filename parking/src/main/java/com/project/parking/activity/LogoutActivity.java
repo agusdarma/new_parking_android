@@ -10,16 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.parking.R;
-import com.project.parking.data.InqForgotPasswordResponse;
-import com.project.parking.data.InqLoginRequest;
+import com.project.parking.data.Constants;
+import com.project.parking.data.LoginData;
 import com.project.parking.data.MessageVO;
 import com.project.parking.util.CipherUtil;
 import com.project.parking.util.HttpClientUtil;
+import com.project.parking.util.RedirectUtils;
+import com.project.parking.util.SharedPreferencesUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -30,68 +30,56 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * Created by Yohanes on 14/06/2017.
- */
-
-public class ForgetPasswordActivity extends AppCompatActivity {
-    private static final String TAG = "ForgetPasswordActivity";
+public class LogoutActivity extends AppCompatActivity {
+    private static final String TAG = "LogoutActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private static final int REQUEST_FORGOT_PASSWORD = 0;
 
     private Context ctx;
-    private ReqForgotPasswordTask reqForgotPasswordTask = null;
+    private ReqLogoutTask reqLogoutTask = null;
     SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
 
-    @Bind(R.id.input_email) EditText _emailText;
-    @Bind(R.id.btn_forget_password) Button _forgetPasswordButton;
-    @Bind(R.id.link_login) TextView _loginLink;
+    @Bind(R.id.btn_logout) Button _logoutButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_forget_password);
-        ctx = ForgetPasswordActivity.this;
+        setContentView(R.layout.activity_logout);
+        ctx = LogoutActivity.this;
         ButterKnife.bind(this);
 
-        _forgetPasswordButton.setOnClickListener(new View.OnClickListener() {
+        _logoutButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                forgetPassword();
+                logout();
             }
         });
 
-        _loginLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Finish the registration screen and return to the Login activity
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
-                startActivity(intent);
-                finish();
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-            }
-        });
+
     }
 
-    public void forgetPassword() {
-        Log.d(TAG, "Forget Password");
+    public void logout() {
+        Log.d(TAG, "Logout");
 
-        if (!validate()) {
-            onFailed();
-            return;
-        }
+//        if (!validate()) {
+//            onLoginFailed();
+//            return;
+//        }
 
-        _forgetPasswordButton.setEnabled(false);
+        _logoutButton.setEnabled(false);
 
-//        final ProgressDialog progressDialog = new ProgressDialog(ForgetPasswordActivity.this,
+//        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
 //                R.style.AppTheme_Dark_Dialog);
 //        progressDialog.setIndeterminate(true);
-//        progressDialog.setMessage("Processing...");
+//        progressDialog.setMessage("Authenticating...");
 //        progressDialog.show();
 
         // TODO: Implement your own authentication logic here.
@@ -100,7 +88,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 new Runnable() {
                     public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
-                        onProcessingSuccess();
+                        onLogoutSuccess();
                         // onLoginFailed();
 //                        progressDialog.dismiss();
                     }
@@ -126,64 +114,68 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    public void onProcessingSuccess() {
-        _forgetPasswordButton.setEnabled(true);
+    public void onLogoutSuccess() {
+        _logoutButton.setEnabled(true);
+//        Toast.makeText(getBaseContext(), "Login Success", Toast.LENGTH_LONG).show();
 
-        Toast.makeText(getBaseContext(), "Submitted..", Toast.LENGTH_LONG).show();
+        // logout user
+        reqLogoutTask = new ReqLogoutTask();
+        reqLogoutTask.execute("");
 
-        String email = _emailText.getText().toString();
-
-        // login user
-        reqForgotPasswordTask = new ReqForgotPasswordTask();
-        reqForgotPasswordTask.execute(email);
     }
 
-    public void onFailed() {
-        Toast.makeText(getBaseContext(), "Failed", Toast.LENGTH_LONG).show();
+    public void onLoginFailed() {
+        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
 
-        _forgetPasswordButton.setEnabled(true);
+        _logoutButton.setEnabled(true);
     }
 
-    public boolean validate() {
-        boolean valid = true;
+//    public boolean validate() {
+//        boolean valid = true;
+//
+//        String email = _emailText.getText().toString();
+//        String password = _passwordText.getText().toString();
+//
+//        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            _emailText.setError("enter a valid email address");
+//            valid = false;
+//        } else {
+//            _emailText.setError(null);
+//        }
+//
+//        if (password.isEmpty() || password.length() < 3 ) { //|| password.length() > 10
+//            _passwordText.setError("min 6 alphanumeric characters");
+//            valid = false;
+//        } else {
+//            _passwordText.setError(null);
+//        }
+//
+//        return valid;
+//    }
 
-        String email = _emailText.getText().toString();
-
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
-            valid = false;
-        } else {
-            _emailText.setError(null);
-        }
-
-        return valid;
-    }
-
-    public class ReqForgotPasswordTask  extends AsyncTask<String, Void, Boolean> {
+    public class ReqLogoutTask  extends AsyncTask<String, Void, Boolean> {
         private ProgressDialog progressDialog = null;
         private final HttpClient client = HttpClientUtil.getNewHttpClient();
         String respString = null;
 
         protected void onPreExecute() {
-            progressDialog = new ProgressDialog(ForgetPasswordActivity.this,
+            progressDialog = new ProgressDialog(LogoutActivity.this,
                     R.style.AppTheme_Dark_Dialog);
             progressDialog.setIndeterminate(true);
-            progressDialog.setCancelable(false);
             progressDialog.setMessage(ctx.getResources().getString(R.string.progress_dialog));
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
         @Override
         protected Boolean doInBackground(String... arg0) {
             boolean result = false;
             try {
-                InqLoginRequest inqLoginRequest = new InqLoginRequest();
-                String email = arg0[0];
-                inqLoginRequest.setEmail(email);
-                String s = HttpClientUtil.getObjectMapper(ctx).writeValueAsString(inqLoginRequest);
+                LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
+                String s = HttpClientUtil.getObjectMapper(ctx).writeValueAsString(loginData);
                 s = CipherUtil.encryptTripleDES(s, CipherUtil.PASSWORD);
                 Log.d(TAG,"Request: " + s);
                 StringEntity entity = new StringEntity(s);
-                HttpPost post = new HttpPost(HttpClientUtil.URL_BASE+HttpClientUtil.URL_FORGOT_PASSWORD);
+                HttpPost post = new HttpPost(HttpClientUtil.URL_BASE+HttpClientUtil.URL_LOGOUT);
                 post.setHeader(HttpClientUtil.CONTENT_TYPE, HttpClientUtil.JSON);
                 post.setEntity(entity);
                 // Execute HTTP request
@@ -220,38 +212,41 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            reqForgotPasswordTask = null;
+            reqLogoutTask = null;
             if (success) {
                 if(!respString.isEmpty()){
                     try {
                         String respons = CipherUtil.decryptTripleDES(respString, CipherUtil.PASSWORD);
-                        MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
-                        InqForgotPasswordResponse inqForgotPasswordResponse = new InqForgotPasswordResponse();
-                        inqForgotPasswordResponse.setMessageVO(messageVO);
-                        if(inqForgotPasswordResponse.getMessageVO().getRc()==0){
-                            Intent i = new Intent(ctx, LoginActivity.class);
-                            startActivity(i);
-                            finish();
+                        final MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
+                        if(messageVO.getRc()==0){
 //                            MessageUtils messageUtils = new MessageUtils(ctx);
-//                            messageUtils.showDialogInfoCallback(ctx.getResources().getString(R.string.message_forgetPass_title), ctx.getResources().getString(R.string.message_forgetPass_success), buttonCallback);
+//                            messageUtils.snackBarMessage(getActivity(),messageVO.getOtherMessage());
+                            goToLoginActivity(ctx);
                         }else{
-                            Toast.makeText(getBaseContext(), messageVO.getMessageRc(), Toast.LENGTH_LONG).show();
 //                            MessageUtils messageUtils = new MessageUtils(ctx);
-//                            messageUtils.snackBarMessage(ForgetPasswordActivity.this,messageVO.getMessageRc());
+//                            messageUtils.snackBarMessage(getActivity(),messageVO.getMessageRc());
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    if(messageVO.getRc()== Constants.SESSION_EXPIRED||messageVO.getRc()==Constants.SESSION_DIFFERENT||messageVO.getRc()==Constants.USER_NOT_LOGIN){
+                                        RedirectUtils redirectUtils = new RedirectUtils(ctx, LogoutActivity.this);
+                                        redirectUtils.redirectToLogin();
+                                    }
+                                }
+                            }, Constants.REDIRECT_DELAY_LOGIN);
                         }
-
                     } catch (Exception e) {
-                        Toast.makeText(getBaseContext(), ForgetPasswordActivity.this.getResources().getString(R.string.message_unexpected_error_message_server), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_message_server), Toast.LENGTH_LONG).show();
 //                        MessageUtils messageUtils = new MessageUtils(ctx);
 //                        messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_message_server));
                     }
                 }else{
-                    Toast.makeText(getBaseContext(), ForgetPasswordActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
 //                    MessageUtils messageUtils = new MessageUtils(ctx);
 //                    messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
                 }
             }else{
-                Toast.makeText(getBaseContext(), ForgetPasswordActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
 //                MessageUtils messageUtils = new MessageUtils(ctx);
 //                messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
             }
@@ -259,5 +254,15 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 progressDialog.dismiss();
             }
         }
+    }
+
+    private void goToLoginActivity(Context ctx)
+    {
+
+//        LogoutActivity.this.getSupportFragmentManager().beginTransaction().remove(this).commit();
+        LogoutActivity.this.finish();
+        Intent intent = new Intent(ctx, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }

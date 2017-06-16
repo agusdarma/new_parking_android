@@ -18,7 +18,7 @@
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal" />
 
-        <!--  Label Change Password-->
+        <!--  logout Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,47 +28,20 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="Change Password"
-                android:textSize="24sp"
-                android:textStyle="bold"
+                android:text="Anda yakin ingin keluar?"
+                android:textSize="18sp"
                 android:typeface="monospace" />
         </android.support.design.widget.TextInputLayout>
 
-        <!--  password lama Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_old_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:hint="Password Lama" />
-        </android.support.design.widget.TextInputLayout>
-
-        <!--  password baru Label -->
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_new_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:hint="Password Baru" />
-        </android.support.design.widget.TextInputLayout>
-
-
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_save"
+            android:id="@+id/btn_logout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"
             android:padding="12dp"
-            android:text="Simpan"/>
+            android:text="Logout"/>
 
     </LinearLayout>
+
 </ScrollView>

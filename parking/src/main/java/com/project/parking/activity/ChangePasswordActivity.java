@@ -84,14 +84,14 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         _saveButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(ChangePasswordActivity.this,
-                R.style.AppTheme_Dark_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Processing...");
-        progressDialog.show();
+//        final ProgressDialog progressDialog = new ProgressDialog(ChangePasswordActivity.this,
+//                R.style.AppTheme_Dark_Dialog);
+//        progressDialog.setIndeterminate(true);
+//        progressDialog.setMessage("Processing...");
+//        progressDialog.show();
 
-        String oldPassword = _oldPassword.getText().toString();
-        String newPassword = _newPassword.getText().toString();
+//        String oldPassword = _oldPassword.getText().toString();
+//        String newPassword = _newPassword.getText().toString();
 
         // TODO: Implement your own authentication logic here.
 
@@ -101,9 +101,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
                         // On complete call either onLoginSuccess or onLoginFailed
                         onProcessingSuccess();
                         // onLoginFailed();
-                        progressDialog.dismiss();
+//                        progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 0);
     }
 
 
@@ -122,7 +122,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // Disable going back to the MainActivity
-        moveTaskToBack(true);
+//        moveTaskToBack(true);
+        RedirectUtils redirectUtils = new RedirectUtils(ctx, ChangePasswordActivity.this);
+        redirectUtils.redirectToMainMenu();
     }
 
     public void onProcessingSuccess() {
@@ -133,13 +135,19 @@ public class ChangePasswordActivity extends AppCompatActivity {
         String oldPassword = _oldPassword.getText().toString();
         String newPassword = _newPassword.getText().toString();
 
-        // login user
-        reqChangePasswordTask = new ReqChangePasswordTask();
-        reqChangePasswordTask.execute(oldPassword, newPassword);
+        LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
+        // ambil dari session untuk email, session key
+        email = loginData.getEmail();
+        sessionkey = loginData.getSessionKey();
+        if (!oldPassword.isEmpty() && !newPassword.isEmpty()&& !email.isEmpty()&& !sessionkey.isEmpty()) {
+            reqChangePasswordTask = new ReqChangePasswordTask();
+            reqChangePasswordTask.execute(oldPassword, newPassword);
+        }
+
     }
 
     public void onFailed() {
-        Toast.makeText(getBaseContext(), "failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), ctx.getResources().getString(R.string.message_password_required), Toast.LENGTH_LONG).show();
 
         _saveButton.setEnabled(true);
     }
@@ -183,6 +191,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
             progressDialog = new ProgressDialog(ChangePasswordActivity.this,
                     R.style.AppTheme_Dark_Dialog);
             progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
             progressDialog.setMessage(ctx.getResources().getString(R.string.progress_dialog));
             progressDialog.show();
         }
@@ -190,11 +199,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... arg0) {
             boolean result = false;
             try {
-                LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
-                // ambil dari session untuk email, session key
-                email = loginData.getEmail();
-                sessionkey = loginData.getSessionKey();
-
                 InqChangePasswordRequest inqChangePasswordRequest = new InqChangePasswordRequest();
                 inqChangePasswordRequest.setEmail(email);
                 inqChangePasswordRequest.setPassword(arg0[0]);

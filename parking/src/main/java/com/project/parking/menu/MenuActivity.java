@@ -1,5 +1,6 @@
 package com.project.parking.menu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,9 @@ import android.widget.Toast;
 import com.goka.blurredgridmenu.GridMenu;
 import com.goka.blurredgridmenu.GridMenuFragment;
 import com.project.parking.R;
+import com.project.parking.activity.ChangePasswordActivity;
+import com.project.parking.activity.LoginActivity;
+import com.project.parking.activity.LogoutActivity;
 import com.project.parking.data.Constants;
 
 import java.util.ArrayList;
@@ -38,16 +42,15 @@ public class MenuActivity extends AppCompatActivity {
         mGridMenuFragment.setOnClickMenuListener(new GridMenuFragment.OnClickMenuListener() {
             @Override
             public void onClickMenu(GridMenu gridMenu, int position) {
-
-                if (gridMenu.getTitle().equals("Change Password")){
-
-                }
-                else if(gridMenu.getTitle().equals("Daftar Mall")){
-
-                }
-                else if(gridMenu.getTitle().equals("History Booking")){
-
-                }
+               Intent i = null;
+               if(Constants.CODE_LOGOUT.equals(gridMenu.getCode())){
+                   i = new Intent(MenuActivity.this, LogoutActivity.class);
+               }
+               else if(Constants.CODE_CHANGE_PASSWORD.equals(gridMenu.getCode())){
+                   i = new Intent(MenuActivity.this, ChangePasswordActivity.class);
+               }
+                startActivity(i);
+                finish();
 
                 Toast.makeText(MenuActivity.this, "Title:" + gridMenu.getTitle() + ", Position:" + position,
                         Toast.LENGTH_SHORT).show();
@@ -69,12 +72,46 @@ public class MenuActivity extends AppCompatActivity {
         mGridMenuFragment.setupMenu(menus);
     }
 
+    private boolean doubleBackToExitPressedOnce = false;
+    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+    private long mBackPressed;
     @Override
     public void onBackPressed() {
-        if (0 == getSupportFragmentManager().getBackStackEntryCount()) {
-            super.onBackPressed();
-        } else {
-            getSupportFragmentManager().popBackStack();
+        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            Intent goToLogin = new Intent(this.getApplicationContext(), LoginActivity.class);
+            goToLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(goToLogin);
+            finish();
+        }else {
+            this.doubleBackToExitPressedOnce=false;
+            Toast.makeText(this, getResources().getString(R.string.confirmation_back), Toast.LENGTH_SHORT).show();
         }
+        mBackPressed = System.currentTimeMillis();
+//        if (0 == getSupportFragmentManager().getBackStackEntryCount()) {
+//            super.onBackPressed();
+//        } else {
+//            getSupportFragmentManager().popBackStack();
+//        }
     }
+
+//    private boolean doubleBackToExitPressedOnce = false;
+//    private static final int TIME_INTERVAL = 2000; // # milliseconds, desired time passed between two back presses.
+//    private long mBackPressed;
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+//                Intent goToLogin = new Intent(this.getApplicationContext(), LoginActivity.class);
+//                goToLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(goToLogin);
+//                finish();
+//            }else {
+//                this.doubleBackToExitPressedOnce=false;
+//                Toast.makeText(this, getResources().getString(R.string.confirmation_back), Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//        mBackPressed = System.currentTimeMillis();
+//        return true;
+//    }
 }
