@@ -148,4 +148,10 @@
     <string name="message_booking_code_required">Booking code harus diisi!</string>
     <string name="message_detail_required">Kolom registrasi masih kosong!</string>
 
+    <string name="buton_menu_change_password">Change Password</string>
+    <string name="buton_menu_logout">LogOut</string>
+    <string name="buton_menu_mall">Mall</string>
+    <string name="buton_menu_history_booking">History Booking</string>
+    <string name="buton_menu_check_in">Check In</string>
+    <string name="buton_menu_refreshing_mall">Refreshing Mall</string>
 </resources>

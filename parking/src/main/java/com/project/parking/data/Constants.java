@@ -35,7 +35,7 @@ public class Constants {
     public static final String STATUS_VAL_EXPIRED_COMPLETE	  = "Complete";
 
     public static final String CODE_CHANGE_PASSWORD	  = "ChangePassword";
-    public static final String CODE_DAFTAR_MALL	      = "DaftarMall";
+    public static final String CODE_LIST_MALL	      = "ListMall";
     public static final String CODE_HISTORY_BOOKING	  = "HistoryBooking";
     public static final String CODE_CHECK_IN	      = "CheckIn";
     public static final String CODE_REFRESHING_MALL	  = "ChangePassword";

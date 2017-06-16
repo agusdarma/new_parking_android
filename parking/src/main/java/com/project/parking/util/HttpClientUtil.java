@@ -56,17 +56,18 @@ public class HttpClientUtil {
 
 //	public static final String URL_BASE = "http://54.191.189.219:8080/parking-trx";
 
-//    public static final String URL_BASE = "http://192.168.1.102:8080/parking-trx";
+
 //    public static final String URL_BASE = "http://192.168.43.174:8080/parking-trx";
 //    public static final String URL_BASE = "http://ec2-52-3-21-158.compute-1.amazonaws.com:8080/parking-trx";
-    public static final String URL_BASE = "http://192.168.0.171:6555/parking-trx";
+//    public static final String URL_BASE = "http://192.168.0.171:6555/parking-trx";
+    public static final String URL_BASE = "http://192.168.0.100:8080/parking-trx";
     /**
      * URL TRX
      */
-    public static final String URL_FORGOT_PASSWORD = "/forgetPassword";
-    public static final String URL_LOGIN = "/loginUser";
-    public static final String URL_CHANGE_PASSWORD = "/changePassword";
-    public static final String URL_LOGOUT = "/logoutUser";
+    public static final String URL_FORGOT_PASSWORD          = "/forgetPassword";
+    public static final String URL_LOGIN                    = "/loginUser";
+    public static final String URL_CHANGE_PASSWORD          = "/changePassword";
+    public static final String URL_LOGOUT                   = "/logoutUser";
     public static final String URL_GET_ALL_MALL = "/listMall";
     public static final String URL_USER_REG= "/userRegistration"; // Registration
     public static final String URL_RECEIVE_TRX_VERITRANS= "/receiveTrxFromVeriTrans"; // payment Confirm
