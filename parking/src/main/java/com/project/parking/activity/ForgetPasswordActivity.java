@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.parking.R;
+import com.project.parking.data.InqForgotPasswordResponse;
 import com.project.parking.data.InqLoginRequest;
 import com.project.parking.data.MessageVO;
 import com.project.parking.util.CipherUtil;
@@ -81,7 +82,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         Log.d(TAG, "Forget Password");
 
         if (!validate()) {
-//            onLoginFailed();
+            onFailed();
             return;
         }
 
@@ -92,8 +93,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Processing...");
         progressDialog.show();
-
-        String email = _emailText.getText().toString();
 
         // TODO: Implement your own authentication logic here.
 
@@ -139,17 +138,16 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         reqForgotPasswordTask.execute(email);
     }
 
-//    public void onLoginFailed() {
-//        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-//
-//        _forgetPasswordButton.setEnabled(true);
-//    }
+    public void onFailed() {
+        Toast.makeText(getBaseContext(), "Failed", Toast.LENGTH_LONG).show();
+
+        _forgetPasswordButton.setEnabled(true);
+    }
 
     public boolean validate() {
         boolean valid = true;
 
         String email = _emailText.getText().toString();
-//        String password = _passwordText.getText().toString();
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             _emailText.setError("enter a valid email address");
@@ -157,13 +155,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         } else {
             _emailText.setError(null);
         }
-
-//        if (password.isEmpty() || password.length() < 3 ) { //|| password.length() > 10
-//            _passwordText.setError("min 6 alphanumeric characters");
-//            valid = false;
-//        } else {
-//            _passwordText.setError(null);
-//        }
 
         return valid;
     }
@@ -234,15 +225,18 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     try {
                         String respons = CipherUtil.decryptTripleDES(respString, CipherUtil.PASSWORD);
                         MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
-                        if(messageVO.getRc()==0){
+                        InqForgotPasswordResponse inqForgotPasswordResponse = new InqForgotPasswordResponse();
+                        inqForgotPasswordResponse.setMessageVO(messageVO);
+                        if(inqForgotPasswordResponse.getMessageVO().getRc()==0){
                             Intent i = new Intent(ctx, LoginActivity.class);
                             startActivity(i);
                             finish();
-                        }
-                        else{
+//                            MessageUtils messageUtils = new MessageUtils(ctx);
+//                            messageUtils.showDialogInfoCallback(ctx.getResources().getString(R.string.message_forgetPass_title), ctx.getResources().getString(R.string.message_forgetPass_success), buttonCallback);
+                        }else{
                             Toast.makeText(getBaseContext(), messageVO.getMessageRc(), Toast.LENGTH_LONG).show();
 //                            MessageUtils messageUtils = new MessageUtils(ctx);
-//                            messageUtils.snackBarMessage(LoginActivity.this,messageVO.getMessageRc());
+//                            messageUtils.snackBarMessage(ForgetPasswordActivity.this,messageVO.getMessageRc());
                         }
 
                     } catch (Exception e) {

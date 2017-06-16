@@ -190,6 +190,7 @@ public class SignupActivity extends AppCompatActivity {
                     R.style.AppTheme_Dark_Dialog);
             progressDialog.setIndeterminate(true);
             progressDialog.setMessage(ctx.getResources().getString(R.string.progress_dialog));
+            progressDialog.setCancelable(false);
             progressDialog.show();
         }
         @Override
