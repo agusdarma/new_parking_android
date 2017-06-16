@@ -7,12 +7,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.project.parking.activity.LoginActivity"
+            android:name="com.project.parking.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,12 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.project.parking.MainActivity" android:theme="@style/AppTheme.Dark" />
-        <activity android:name="com.project.parking.menu.MenuActivity" android:theme="@style/AppTheme.Dark" />
+        <activity android:name="com.project.parking.activity.LoginActivity" android:theme="@style/AppTheme.Dark" />
         <activity android:name="com.project.parking.activity.SignupActivity" android:theme="@style/AppTheme.Dark" />
         <activity android:name="com.project.parking.activity.ForgetPasswordActivity" android:theme="@style/AppTheme.Dark" />
-        <activity android:name="com.project.parking.activity.LogoutActivity" android:theme="@style/AppTheme.Dark" />
-        <activity android:name="com.project.parking.activity.ChangePasswordActivity" android:theme="@style/AppTheme.Dark" />
+        <activity android:name="com.project.parking.menu.MenuActivity" android:theme="@style/AppTheme.Dark" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="9c3548eaa37c57b1cdd980bc882bad96410b970a" />

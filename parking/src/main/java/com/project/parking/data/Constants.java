@@ -14,6 +14,10 @@ public class Constants {
     public static final int SESSION_DIFFERENT			= 18; // SESSION_DIFFERENT EXPIRED
     public static final int REDIRECT_DELAY_LOGIN		= 3000;
 
+    //Fragments Tags
+    public static final String Login_Fragment = "Login_Fragment";
+    public static final String SignUp_Fragment = "SignUp_Fragment";
+    public static final String ForgotPassword_Fragment = "ForgotPassword_Fragment";
 
     public static final int STATUS_NEED_TO_PAY								= 0	;
     public static final int STATUS_AUTO_RELEASE_AFTER_BOOKING				= 1	;
