@@ -73,16 +73,16 @@ public class Login_Fragment extends Fragment implements OnClickListener {
 				R.anim.shake);
 
 //		// Setting text selector over textviews
-//		XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
-//		try {
-//			ColorStateList csl = ColorStateList.createFromXml(getResources(),
-//					xrp);
-//
-//			forgotPassword.setTextColor(csl);
-//			show_hide_password.setTextColor(csl);
-//			signUp.setTextColor(csl);
-//		} catch (Exception e) {
-//		}
+		XmlResourceParser xrp = getResources().getXml(R.drawable.text_selector);
+		try {
+			ColorStateList csl = ColorStateList.createFromXml(getResources(),
+					xrp);
+
+			forgotPassword.setTextColor(csl);
+			show_hide_password.setTextColor(csl);
+			signUp.setTextColor(csl);
+		} catch (Exception e) {
+		}
 	}
 
 	// Set Listeners
