@@ -5,6 +5,8 @@
     android:orientation="vertical"
     android:padding="20dp" >
 
+
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -81,7 +83,7 @@
         android:layout_height="1px"
         android:background="@color/white_greyish" />
 
-    <EditText
+    <!-- <EditText
         android:id="@+id/location"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -101,7 +103,7 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="1px"
-        android:background="@color/white_greyish" />
+        android:background="@color/white_greyish" /> -->
 
     <EditText
         android:id="@+id/password"
@@ -162,6 +164,7 @@
         android:textColor="@color/background_color"
         android:textSize="17sp"
         android:textStyle="bold" />
+
 
     <TextView
         android:id="@+id/already_user"

@@ -1,10 +1,8 @@
 package com.project.parking.activity;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,29 +10,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.project.parking.MainFragment;
 import com.project.parking.R;
-import com.project.parking.data.Constants;
 import com.project.parking.data.LoginData;
 import com.project.parking.data.MessageVO;
+import com.project.parking.service.ApiInterface;
+import com.project.parking.util.ApiClient;
 import com.project.parking.util.CipherUtil;
 import com.project.parking.util.HttpClientUtil;
-import com.project.parking.util.RedirectUtils;
 import com.project.parking.util.SharedPreferencesUtils;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.util.EntityUtils;
-
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LogoutActivity extends AppCompatActivity {
     private static final String TAG = "LogoutActivity";
@@ -42,7 +34,7 @@ public class LogoutActivity extends AppCompatActivity {
     private static final int REQUEST_FORGOT_PASSWORD = 0;
 
     private Context ctx;
-    private ReqLogoutTask reqLogoutTask = null;
+//    private ReqLogoutTask reqLogoutTask = null;
     SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
 
@@ -110,7 +102,7 @@ public class LogoutActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Disable going back to the MainActivity
+        // Disable going back to the MainFragment
         moveTaskToBack(true);
     }
 
@@ -118,9 +110,10 @@ public class LogoutActivity extends AppCompatActivity {
         _logoutButton.setEnabled(true);
 //        Toast.makeText(getBaseContext(), "Login Success", Toast.LENGTH_LONG).show();
 
-        // logout user
-        reqLogoutTask = new ReqLogoutTask();
-        reqLogoutTask.execute("");
+        // doLogout
+        doLogout();
+//        reqLogoutTask = new ReqLogoutTask();
+//        reqLogoutTask.execute("");
 
     }
 
@@ -128,6 +121,55 @@ public class LogoutActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
 
         _logoutButton.setEnabled(true);
+    }
+
+    private void doLogout() {
+        LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
+        String s = null;
+        try {
+            s = HttpClientUtil.getObjectMapper(ctx).writeValueAsString(loginData);
+        } catch (IOException e) {
+            Log.e(TAG, "IOException : "+e);
+            e.printStackTrace();
+        }
+        s = CipherUtil.encryptTripleDES(s, CipherUtil.PASSWORD);
+        Log.d(TAG,"Request: " + s);
+
+        ApiInterface apiService = ApiClient.getClient().create(ApiInterface.class);
+        Call<String> call = apiService.doLogout(s);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String>call, Response<String> response) {
+//				List<Movie> movies = response.body().getResults();
+//				Log.d(TAG, "Number of movies received: " + movies.size());
+                Log.d(TAG, "Response: " + response.body().toString());
+//				Toast.makeText(getActivity(), "Berhasil Masukk...", Toast.LENGTH_LONG).show();
+                if(!response.body().toString().isEmpty()){
+                    try {
+                        String respons = CipherUtil.decryptTripleDES(response.body().toString(), CipherUtil.PASSWORD);
+                        MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
+                        if(messageVO.getRc()==0){
+                            goToLoginActivity(ctx);
+                        }
+                        else{
+                            Toast.makeText(ctx, messageVO.getMessageRc(), Toast.LENGTH_LONG).show();
+                        }
+
+                    } catch (Exception e) {
+                        Toast.makeText(ctx, LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_message_server), Toast.LENGTH_LONG).show();
+                    }
+                }else{
+                    Toast.makeText(ctx, LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String>call, Throwable t) {
+                // Log error here since request failed
+                Log.e(TAG, t.toString());
+                Toast.makeText(ctx, t.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
 //    public boolean validate() {
@@ -153,115 +195,113 @@ public class LogoutActivity extends AppCompatActivity {
 //        return valid;
 //    }
 
-    public class ReqLogoutTask  extends AsyncTask<String, Void, Boolean> {
-        private ProgressDialog progressDialog = null;
-        private final HttpClient client = HttpClientUtil.getNewHttpClient();
-        String respString = null;
-
-        protected void onPreExecute() {
-            progressDialog = new ProgressDialog(LogoutActivity.this,
-                    R.style.AppTheme_Dark_Dialog);
-            progressDialog.setIndeterminate(true);
-            progressDialog.setMessage(ctx.getResources().getString(R.string.progress_dialog));
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-        @Override
-        protected Boolean doInBackground(String... arg0) {
-            boolean result = false;
-            try {
-                LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
-                String s = HttpClientUtil.getObjectMapper(ctx).writeValueAsString(loginData);
-                s = CipherUtil.encryptTripleDES(s, CipherUtil.PASSWORD);
-                Log.d(TAG,"Request: " + s);
-                StringEntity entity = new StringEntity(s);
-                HttpPost post = new HttpPost(HttpClientUtil.URL_BASE+HttpClientUtil.URL_LOGOUT);
-                post.setHeader(HttpClientUtil.CONTENT_TYPE, HttpClientUtil.JSON);
-                post.setEntity(entity);
-                // Execute HTTP request
-                Log.d(TAG,"Executing request: " + post.getURI());
-                HttpResponse response = client.execute(post);
-                HttpEntity respEntity = response.getEntity();
-                respString = EntityUtils.toString(respEntity);
-                result = true;
-            } catch (ClientProtocolException e) {
-                Log.e(TAG, "ClientProtocolException : "+e);
-                respString = ctx.getResources().getString(R.string.message_unexpected_error_message_server);
-                cancel(true);
-            } catch (IOException e) {
-                Log.e(TAG, "IOException : "+e);
-                respString = ctx.getResources().getString(R.string.message_no_internet_connection);
-                cancel(true);
-            } catch (Exception e) {
-                Log.e(TAG, "Exception : "+e);
-                respString = ctx.getResources().getString(R.string.message_unexpected_error_message_server);
-                cancel(true);
-            }
-            return result;
-        }
-
-        @Override
-        protected void onCancelled() {
-            if(progressDialog.isShowing()){
-                progressDialog.dismiss();
-            }
-            Toast.makeText(getBaseContext(), respString, Toast.LENGTH_LONG).show();
-//            MessageUtils messageUtils = new MessageUtils(ctx);
-//            messageUtils.snackBarMessage(LoginActivity.this,respString);
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            reqLogoutTask = null;
-            if (success) {
-                if(!respString.isEmpty()){
-                    try {
-                        String respons = CipherUtil.decryptTripleDES(respString, CipherUtil.PASSWORD);
-                        final MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
-                        if(messageVO.getRc()==0){
-//                            MessageUtils messageUtils = new MessageUtils(ctx);
-//                            messageUtils.snackBarMessage(getActivity(),messageVO.getOtherMessage());
-                            goToLoginActivity(ctx);
-                        }else{
-//                            MessageUtils messageUtils = new MessageUtils(ctx);
-//                            messageUtils.snackBarMessage(getActivity(),messageVO.getMessageRc());
-                            new Timer().schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    if(messageVO.getRc()== Constants.SESSION_EXPIRED||messageVO.getRc()==Constants.SESSION_DIFFERENT||messageVO.getRc()==Constants.USER_NOT_LOGIN){
-                                        RedirectUtils redirectUtils = new RedirectUtils(ctx, LogoutActivity.this);
-                                        redirectUtils.redirectToLogin();
-                                    }
-                                }
-                            }, Constants.REDIRECT_DELAY_LOGIN);
-                        }
-                    } catch (Exception e) {
-                        Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_message_server), Toast.LENGTH_LONG).show();
-//                        MessageUtils messageUtils = new MessageUtils(ctx);
-//                        messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_message_server));
-                    }
-                }else{
-                    Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
-//                    MessageUtils messageUtils = new MessageUtils(ctx);
-//                    messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
-                }
-            }else{
-                Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
-//                MessageUtils messageUtils = new MessageUtils(ctx);
-//                messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
-            }
-            if(progressDialog.isShowing()){
-                progressDialog.dismiss();
-            }
-        }
-    }
+//    public class ReqLogoutTask  extends AsyncTask<String, Void, Boolean> {
+//        private ProgressDialog progressDialog = null;
+//        private final HttpClient client = HttpClientUtil.getNewHttpClient();
+//        String respString = null;
+//
+//        protected void onPreExecute() {
+//            progressDialog = new ProgressDialog(LogoutActivity.this,
+//                    R.style.AppTheme_Dark_Dialog);
+//            progressDialog.setIndeterminate(true);
+//            progressDialog.setMessage(ctx.getResources().getString(R.string.progress_dialog));
+//            progressDialog.setCancelable(false);
+//            progressDialog.show();
+//        }
+//        @Override
+//        protected Boolean doInBackground(String... arg0) {
+//            boolean result = false;
+//            try {
+//                LoginData loginData = SharedPreferencesUtils.getLoginData(ctx);
+//                String s = HttpClientUtil.getObjectMapper(ctx).writeValueAsString(loginData);
+//                s = CipherUtil.encryptTripleDES(s, CipherUtil.PASSWORD);
+//                Log.d(TAG,"Request: " + s);
+//                StringEntity entity = new StringEntity(s);
+//                HttpPost post = new HttpPost(HttpClientUtil.URL_BASE+HttpClientUtil.URL_LOGOUT);
+//                post.setHeader(HttpClientUtil.CONTENT_TYPE, HttpClientUtil.JSON);
+//                post.setEntity(entity);
+//                // Execute HTTP request
+//                Log.d(TAG,"Executing request: " + post.getURI());
+//                HttpResponse response = client.execute(post);
+//                HttpEntity respEntity = response.getEntity();
+//                respString = EntityUtils.toString(respEntity);
+//                result = true;
+//            } catch (ClientProtocolException e) {
+//                Log.e(TAG, "ClientProtocolException : "+e);
+//                respString = ctx.getResources().getString(R.string.message_unexpected_error_message_server);
+//                cancel(true);
+//            } catch (IOException e) {
+//                Log.e(TAG, "IOException : "+e);
+//                respString = ctx.getResources().getString(R.string.message_no_internet_connection);
+//                cancel(true);
+//            } catch (Exception e) {
+//                Log.e(TAG, "Exception : "+e);
+//                respString = ctx.getResources().getString(R.string.message_unexpected_error_message_server);
+//                cancel(true);
+//            }
+//            return result;
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+//            if(progressDialog.isShowing()){
+//                progressDialog.dismiss();
+//            }
+//            Toast.makeText(getBaseContext(), respString, Toast.LENGTH_LONG).show();
+////            MessageUtils messageUtils = new MessageUtils(ctx);
+////            messageUtils.snackBarMessage(LoginActivity.this,respString);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(final Boolean success) {
+//            reqLogoutTask = null;
+//            if (success) {
+//                if(!respString.isEmpty()){
+//                    try {
+//                        String respons = CipherUtil.decryptTripleDES(respString, CipherUtil.PASSWORD);
+//                        final MessageVO messageVO = HttpClientUtil.getObjectMapper(ctx).readValue(respons, MessageVO.class);
+//                        if(messageVO.getRc()==0){
+////                            MessageUtils messageUtils = new MessageUtils(ctx);
+////                            messageUtils.snackBarMessage(getActivity(),messageVO.getOtherMessage());
+//                            goToLoginActivity(ctx);
+//                        }else{
+////                            MessageUtils messageUtils = new MessageUtils(ctx);
+////                            messageUtils.snackBarMessage(getActivity(),messageVO.getMessageRc());
+//                            new Timer().schedule(new TimerTask() {
+//                                @Override
+//                                public void run() {
+//                                    if(messageVO.getRc()== Constants.SESSION_EXPIRED||messageVO.getRc()==Constants.SESSION_DIFFERENT||messageVO.getRc()==Constants.USER_NOT_LOGIN){
+//                                        RedirectUtils redirectUtils = new RedirectUtils(ctx, LogoutActivity.this);
+//                                        redirectUtils.redirectToLogin();
+//                                    }
+//                                }
+//                            }, Constants.REDIRECT_DELAY_LOGIN);
+//                        }
+//                    } catch (Exception e) {
+//                        Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_message_server), Toast.LENGTH_LONG).show();
+////                        MessageUtils messageUtils = new MessageUtils(ctx);
+////                        messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_message_server));
+//                    }
+//                }else{
+//                    Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
+////                    MessageUtils messageUtils = new MessageUtils(ctx);
+////                    messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
+//                }
+//            }else{
+//                Toast.makeText(getBaseContext(), LogoutActivity.this.getResources().getString(R.string.message_unexpected_error_server), Toast.LENGTH_LONG).show();
+////                MessageUtils messageUtils = new MessageUtils(ctx);
+////                messageUtils.snackBarMessage(LoginActivity.this,LoginActivity.this.getResources().getString(R.string.message_unexpected_error_server));
+//            }
+//            if(progressDialog.isShowing()){
+//                progressDialog.dismiss();
+//            }
+//        }
+//    }
 
     private void goToLoginActivity(Context ctx)
     {
-
-//        LogoutActivity.this.getSupportFragmentManager().beginTransaction().remove(this).commit();
         LogoutActivity.this.finish();
-        Intent intent = new Intent(ctx, LoginActivity.class);
+        Intent intent = new Intent(ctx, MainFragment.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

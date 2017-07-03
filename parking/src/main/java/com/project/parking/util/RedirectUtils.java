@@ -5,8 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 
-import com.project.parking.MainActivity;
-import com.project.parking.activity.LoginActivity;
+import com.project.parking.MainFragment;
 import com.project.parking.menu.MenuActivity;
 
 /**
@@ -29,7 +28,7 @@ public class RedirectUtils extends Fragment {
     public void redirectToLogin() {
         act.getFragmentManager().beginTransaction().remove(this).commit();
         act.finish();
-        Intent intent = new Intent(ctx, LoginActivity.class);
+        Intent intent = new Intent(ctx, MainFragment.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ctx.startActivity(intent);
     }

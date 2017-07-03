@@ -7,11 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.project.parking.activity.Login_Fragment;
+import com.project.parking.activity.LoginFragment;
 import com.project.parking.data.Constants;
-import com.project.parking.util.Utils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainFragment extends AppCompatActivity {
 	private static FragmentManager fragmentManager;
 
 	@Override
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 		if (savedInstanceState == null) {
 			fragmentManager
 					.beginTransaction()
-					.replace(R.id.frameContainer, new Login_Fragment(),
+					.replace(R.id.frameContainer, new LoginFragment(),
 							Constants.Login_Fragment).commit();
 		}
 
@@ -46,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 		fragmentManager
 				.beginTransaction()
 				.setCustomAnimations(R.anim.left_enter, R.anim.right_out)
-				.replace(R.id.frameContainer, new Login_Fragment(),
+				.replace(R.id.frameContainer, new LoginFragment(),
 						Constants.Login_Fragment).commit();
 	}
 

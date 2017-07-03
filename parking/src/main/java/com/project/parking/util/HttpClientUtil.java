@@ -64,7 +64,7 @@ public class HttpClientUtil {
     /**
      * URL TRX
      */
-    public static final String URL_FORGOT_PASSWORD          = "/forgetPassword";
+    public static final String URL_FORGOT_PASSWORD          = "/changePassword";
     public static final String URL_LOGIN                    = "/loginUser";
     public static final String URL_CHANGE_PASSWORD          = "/changePassword";
     public static final String URL_LOGOUT                   = "/logoutUser";
