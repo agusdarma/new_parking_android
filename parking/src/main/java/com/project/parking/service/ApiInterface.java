@@ -32,4 +32,10 @@ public interface ApiInterface {
 
     @POST("refreshCacheMall")
     Call<String> doRefreshingMall(@Body String body);
+
+    @POST("checkBookingCode")
+    Call<String> checkBookingCode(@Body String body);
+
+    @POST("confirmCodeBooking")
+    Call<String> confirmCodeBooking(@Body String body);
 }
